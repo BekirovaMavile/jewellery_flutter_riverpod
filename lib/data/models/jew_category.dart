@@ -4,5 +4,11 @@ class JewCategory {
   final JewType type;
   bool isSelected;
 
-  JewCategory(this.type, this.isSelected);
+  JewCategory({required this.type, required this.isSelected});
+  JewCategory copyWith({JewType? type, bool? isSelected}) {
+    return JewCategory(
+      type: type ?? this.type,
+      isSelected: isSelected ?? this.isSelected,
+    );
+  }
 }

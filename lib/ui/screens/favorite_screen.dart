@@ -1,33 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:jewellry_shop/data/_data.dart';
-import 'package:jewellry_shop/states/jew_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jewellry_shop/states/shared_bloc/shared_bloc.dart';
 import 'package:jewellry_shop/ui/widgets/empty_wrapper.dart';
 import 'package:jewellry_shop/ui_kit/_ui_kit.dart';
 
-class FavoriteScreen extends StatefulWidget {
-  const FavoriteScreen({super.key});
-
-  @override
-  State<FavoriteScreen> createState() => FavoriteScreenState();
-}
-
-class FavoriteScreenState extends State<FavoriteScreen> {
-  // var favoriteJew = AppData.favoriteItems;
-  List<Jew> get favoriteJew => JewState().favorite;
-
-  void update() {
-    setState(() {});
-  }
+class FavoriteScreen extends StatelessWidget {
+  FavoriteScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    context.select((SharedBloc b) => b.favorite.length);
+    final favoriteItems = context.read<SharedBloc>().favorite;
+    debugPrint('FavoriteScreen >> Перерисовка любимых');
     return Scaffold(
       appBar: _appBar(context),
       body: EmptyWrapper(
         type: EmptyWrapperType.favorite,
-        title: 'Empty favorite',
-        isEmpty: favoriteJew.isEmpty,
-        child: _favoriteListView(),
+        title: "Empty favorite",
+        isEmpty: favoriteItems.isEmpty,
+        child: _favoriteListView(context),
       ),
     );
   }
@@ -41,14 +33,16 @@ class FavoriteScreenState extends State<FavoriteScreen> {
     );
   }
 
-  Widget _favoriteListView() {
+  Widget _favoriteListView(BuildContext context) {
+    context.select((SharedBloc b) => b.favorite.length);
+    final favoriteItems = context.read<SharedBloc>().favorite;
     return ListView.separated(
       padding: const EdgeInsets.all(30),
-      itemCount: favoriteJew.length,
+      itemCount: favoriteItems.length,
       itemBuilder: (_, index) {
-        Jew jew = favoriteJew[index];
+        Jew jew = favoriteItems[index];
         return Card(
-          color: Theme.of(context).brightness == Brightness.light ? Colors.white : DarkThemeColor.primaryLight,
+          color: Theme.of(context).brightness == Brightness.light ? Colors.white : DarkThemeColor.primaryDark,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
           ),

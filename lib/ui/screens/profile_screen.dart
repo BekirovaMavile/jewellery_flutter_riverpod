@@ -16,7 +16,7 @@ class ProfileScreen extends StatelessWidget {
             child: Image.asset(AppAsset.profileImage, width: 300),
           ),
           Text(
-            "Hello Lightwood!",
+            "Hello Mavi!",
             style: Theme.of(context).textTheme.displayLarge,
           ),
           const Row(

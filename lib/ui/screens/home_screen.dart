@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jewellry_shop/data/_data.dart';
-import 'package:jewellry_shop/states/jew_state.dart';
 
+import '../../data/_data.dart';
 import '../_ui.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,21 +12,17 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen> {
   final List<Widget> screens = [
-    const JewList(),
-    CartScreen(key: JewState().cartKey,),
-    FavoriteScreen(key: JewState().favoriteKey,),
-    const ProfileScreen()
-  ];
+    JewList(),
+    CartScreen(),
+    FavoriteScreen(),
+    const ProfileScreen()];
   int currentIndex = 0;
 
   void onTabTap(int index) {
     if (currentIndex == index) return;
     currentIndex = index;
     setState(() {});
-    if (index == 1) JewState().cartKey.currentState?.update();
-    if (index == 2) JewState().favoriteKey.currentState?.update();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +38,7 @@ class HomeScreenState extends State<HomeScreen> {
         onTap: onTabTap,
         selectedFontSize: 0,
         items: AppData.bottomNavigationItems.map(
-          (element) {
+              (element) {
             return BottomNavigationBarItem(
               icon: element.disableIcon,
               label: element.label,
