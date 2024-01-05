@@ -3,7 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jewellry_shop/data/_data.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:jewellry_shop/states/shared_bloc/shared_bloc.dart';
+import 'package:jewellry_shop/states/shared_cubit/shared_cubit.dart';
 import 'package:jewellry_shop/ui/widgets/counter_button.dart';
 import 'package:jewellry_shop/ui_kit/_ui_kit.dart';
 
@@ -40,11 +40,11 @@ class JewDetail extends StatelessWidget {
   Widget _floatingActionButton(BuildContext context) {
     return Builder(
         builder: (context) {
-          final favorite = context.watch<SharedBloc>().getJewById(jew.id).isFavorite;
+          final favorite = context.watch<SharedCubit>().getJewById(jew.id).isFavorite;
           return FloatingActionButton(
             elevation: 0.0,
             backgroundColor: LightThemeColor.purple,
-            onPressed: () => context.read<SharedBloc>().add(AddRemoveFavoriteTapEvent(jew.id)),
+            onPressed: () => context.read<SharedCubit>().onAddRemoveFavoriteTap(jew.id),
             child: favorite ? const Icon(AppIcon.heart) : const Icon(AppIcon.outlinedHeart),
           );
         }
@@ -106,11 +106,11 @@ class JewDetail extends StatelessWidget {
                             style: Theme.of(context).textTheme.displayLarge?.copyWith(color: LightThemeColor.purple),
                           ),
                           CounterButton(
-                            onIncrementTap: () => context.read<SharedBloc>().add(IncreaseQuantityTapEvent(jew.id)),
-                            onDecrementTap: () => context.read<SharedBloc>().add(DecreaseQuantityTapEvent(jew.id)),
+                            onIncrementTap: () => context.read<SharedCubit>().onIncreaseQuantityTap(jew.id),
+                            onDecrementTap: () => context.read<SharedCubit>().onDecreaseQuantityTap(jew.id),
                             label: Builder(
                                 builder: (context) {
-                                  final quantity = context.select((SharedBloc b) => b.getJewById(jew.id).quantity);
+                                  final quantity = context.select((SharedCubit b) => b.getJewById(jew.id).quantity);
                                   debugPrint('JewDetail >> Управление количеством');
                                   return Text(
                                     quantity.toString(),
@@ -138,7 +138,7 @@ class JewDetail extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: ElevatedButton(
-                            onPressed: () => context.read<SharedBloc>().add(AddToCartTapEvent(jew.id)),
+                            onPressed: () => context.read<SharedCubit>().onAddToCartTap(jew.id),
                             child: const Text("Add to cart"),
                           ),
                         ),

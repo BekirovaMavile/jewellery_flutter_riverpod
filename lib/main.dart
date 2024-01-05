@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jewellry_shop/states/jew_state.dart';
-import 'package:jewellry_shop/states/shared_bloc/shared_bloc.dart';
+import 'package:jewellry_shop/states/shared_cubit/shared_cubit.dart';
+import 'package:jewellry_shop/states/shared_cubit/shared_cubit.dart';
 import 'package:jewellry_shop/ui/_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jewellry_shop/ui/screens/home_screen.dart';
@@ -16,11 +17,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<SharedBloc>(
-      create: (context) => SharedBloc(),
+    return BlocProvider<SharedCubit>(
+      create: (context) => SharedCubit(),
       child: Builder(
           builder: (context) {
-            final isLight = context.select((SharedBloc b) => b.state.isLight);
+            final isLight = context.select((SharedCubit b) => b.state.isLight);
             return MaterialApp(
               title: 'Jewellery Shop',
               theme: isLight ? AppTheme.lightTheme: AppTheme.darkTheme,

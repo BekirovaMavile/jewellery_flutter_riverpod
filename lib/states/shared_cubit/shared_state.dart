@@ -1,4 +1,4 @@
-part of 'shared_bloc.dart';
+part of 'shared_cubit.dart';
 
 class SharedState extends Equatable {
   SharedState({

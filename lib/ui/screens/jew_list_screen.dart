@@ -1,7 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart' hide Badge;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:jewellry_shop/states/shared_bloc/shared_bloc.dart';
+import 'package:jewellry_shop/states/shared_cubit/shared_cubit.dart';
 import 'package:jewellry_shop/ui/extensions/app_extension.dart';
 import 'package:jewellry_shop/ui/widgets/jew_list_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,7 +38,7 @@ class JewList extends StatelessWidget {
               Builder(
                   builder: (context) {
                     debugPrint('JewList >> Фильтрация категорий');
-                    final jewsByCategory = context.select((SharedBloc b) => b.state.jewsByCategory);
+                    final jewsByCategory = context.select((SharedCubit b) => b.state.jewsByCategory);
                     return JewListView(jews: jewsByCategory);
                   }
               ),
@@ -64,8 +64,8 @@ class JewList extends StatelessWidget {
               Builder(
                   builder: (context) {
                     debugPrint('JewList >> Лучшие предложения недели');
-                    context.select((SharedBloc b) => b.state.jews.length);
-                    final jews = context.read<SharedBloc>().state.jews;
+                    context.select((SharedCubit b) => b.state.jews.length);
+                    final jews = context.read<SharedCubit>().state.jews;
                     return JewListView(
                       jews: jews,
                       isReversed: true,
@@ -83,7 +83,7 @@ class JewList extends StatelessWidget {
     return AppBar(
       leading: IconButton(
         icon: const FaIcon(FontAwesomeIcons.dice),
-        onPressed: () => context.read<SharedBloc>().add(ToggleThemeTabEvent()),
+        onPressed: () => context.read<SharedCubit>().onToggleThemeTab(),
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -131,19 +131,19 @@ class JewList extends StatelessWidget {
         height: 40,
         child: Builder(
             builder: (context) {
-              final categoriesLength = context.select((SharedBloc b) => b.state.categories.length);
+              final categoriesLength = context.select((SharedCubit b) => b.state.categories.length);
               debugPrint('JewList >> Изменение длины списка категории');
               return ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (_, index) {
                     return Builder(
                         builder: (context) {
-                          final isSelected = context.select((SharedBloc b) => b.state.categories[index].isSelected);
-                          final category = context.read<SharedBloc>().state.categories[index];
+                          final isSelected = context.select((SharedCubit b) => b.state.categories[index].isSelected);
+                          final category = context.read<SharedCubit>().state.categories[index];
                           debugPrint('JewList >> Перерисовка категории ${category.type}');
                           return GestureDetector(
                             onTap: (){
-                              context.read<SharedBloc>().add(CategoryTapEvent(category));
+                              context.read<SharedCubit>().onCategoryTap(category);
                             },
                             child: Container(
                               width: 100,
