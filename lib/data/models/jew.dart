@@ -1,8 +1,6 @@
-import 'package:equatable/equatable.dart';
-
 enum JewType { all, ring, earring, watch, bracelet, pendant, brooch }
 
-class Jew extends Equatable {
+class Jew{
   int id;
   String image;
   String name;

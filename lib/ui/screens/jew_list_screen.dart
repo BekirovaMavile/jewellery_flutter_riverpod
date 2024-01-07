@@ -1,18 +1,24 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart' hide Badge;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:jewellry_shop/states/shared_cubit/shared_cubit.dart';
+import 'package:jewellry_shop/data/models/jew.dart';
+import 'package:jewellry_shop/states/category/category_provider.dart';
+import 'package:jewellry_shop/states/jew/jew_provider.dart';
+import 'package:jewellry_shop/states/jew_state.dart';
+import 'package:jewellry_shop/states/theme/theme_provider.dart';
 import 'package:jewellry_shop/ui/extensions/app_extension.dart';
 import 'package:jewellry_shop/ui/widgets/jew_list_view.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/_data.dart';
 import '../../ui_kit/_ui_kit.dart';
+import 'package:provider/provider.dart';
 
 class JewList extends StatelessWidget {
   const JewList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('JewList >> Перерисовка всего экрана');
+    final List<Jew> jewList = context.watch<JewProvider>().state.jewList;
+    final List<Jew> filteredJew = context.watch<CategoryProvider>().state.jews;
     return Scaffold(
       appBar: _appBar(context),
       body: Padding(
@@ -35,13 +41,7 @@ class JewList extends StatelessWidget {
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               _categories(context),
-              Builder(
-                  builder: (context) {
-                    debugPrint('JewList >> Фильтрация категорий');
-                    final jewsByCategory = context.select((SharedCubit b) => b.state.jewsByCategory);
-                    return JewListView(jews: jewsByCategory);
-                  }
-              ),
+              JewListView(jews: filteredJew),
               Padding(
                 padding: const EdgeInsets.only(top: 25, bottom: 5),
                 child: Row(
@@ -61,17 +61,7 @@ class JewList extends StatelessWidget {
                   ],
                 ),
               ),
-              Builder(
-                  builder: (context) {
-                    debugPrint('JewList >> Лучшие предложения недели');
-                    context.select((SharedCubit b) => b.state.jews.length);
-                    final jews = context.read<SharedCubit>().state.jews;
-                    return JewListView(
-                      jews: jews,
-                      isReversed: true,
-                    );
-                  }
-              ),
+              JewListView(jews: jewList, isReversed: true),
             ],
           ),
         ),
@@ -83,7 +73,7 @@ class JewList extends StatelessWidget {
     return AppBar(
       leading: IconButton(
         icon: const FaIcon(FontAwesomeIcons.dice),
-        onPressed: () => context.read<SharedCubit>().onToggleThemeTab(),
+        onPressed: () => context.read<ThemeProvider>().switchTheme(),
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -131,25 +121,24 @@ class JewList extends StatelessWidget {
         height: 40,
         child: Builder(
             builder: (context) {
-              final categoriesLength = context.select((SharedCubit b) => b.state.categories.length);
+              final List<JewCategory> categories = context.watch<CategoryProvider>().state.jewCategories;
               debugPrint('JewList >> Изменение длины списка категории');
               return ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (_, index) {
                     return Builder(
                         builder: (context) {
-                          final isSelected = context.select((SharedCubit b) => b.state.categories[index].isSelected);
-                          final category = context.read<SharedCubit>().state.categories[index];
+                          final category = categories[index];
                           debugPrint('JewList >> Перерисовка категории ${category.type}');
                           return GestureDetector(
-                            onTap: (){
-                              context.read<SharedCubit>().onCategoryTap(category);
-                            },
+                            onTap: () =>
+                              context
+                                  .read<CategoryProvider>().onCategoryTab(category),
                             child: Container(
                               width: 100,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: isSelected ? LightThemeColor.purple : Colors.transparent,
+                                color: category.isSelected ? LightThemeColor.purple : Colors.transparent,
                                 borderRadius: const BorderRadius.all(
                                   Radius.circular(15),
                                 ),
@@ -166,7 +155,7 @@ class JewList extends StatelessWidget {
                   separatorBuilder: (_, __) => Container(
                     width: 15,
                   ),
-                  itemCount: categoriesLength);
+                  itemCount: categories.length);
             }
         ),
       ),

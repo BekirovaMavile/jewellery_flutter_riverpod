@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jewellry_shop/data/_data.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:jewellry_shop/states/shared_cubit/shared_cubit.dart';
+import 'package:jewellry_shop/states/jew/jew_provider.dart';
+import 'package:jewellry_shop/states/jew_state.dart';
+import 'package:provider/provider.dart';
 import 'package:jewellry_shop/ui/widgets/empty_wrapper.dart';
 import 'package:jewellry_shop/ui_kit/_ui_kit.dart';
 
@@ -10,15 +11,14 @@ class FavoriteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.select((SharedCubit b) => b.favorite.length);
-    final favoriteItems = context.read<SharedCubit>().favorite;
+    final favoriteJew = context.watch<JewProvider>().isFavorite;
     debugPrint('FavoriteScreen >> Перерисовка любимых');
     return Scaffold(
       appBar: _appBar(context),
       body: EmptyWrapper(
         type: EmptyWrapperType.favorite,
         title: "Empty favorite",
-        isEmpty: favoriteItems.isEmpty,
+        isEmpty: favoriteJew.isEmpty,
         child: _favoriteListView(context),
       ),
     );
@@ -34,13 +34,12 @@ class FavoriteScreen extends StatelessWidget {
   }
 
   Widget _favoriteListView(BuildContext context) {
-    context.select((SharedCubit b) => b.favorite.length);
-    final favoriteItems = context.read<SharedCubit>().favorite;
+    final favoriteJew = context.watch<JewProvider>().isFavorite;
     return ListView.separated(
       padding: const EdgeInsets.all(30),
-      itemCount: favoriteItems.length,
+      itemCount: favoriteJew.length,
       itemBuilder: (_, index) {
-        Jew jew = favoriteItems[index];
+        Jew jew = favoriteJew[index];
         return Card(
           color: Theme.of(context).brightness == Brightness.light ? Colors.white : DarkThemeColor.primaryDark,
           shape: RoundedRectangleBorder(

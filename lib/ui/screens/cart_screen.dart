@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:jewellry_shop/states/shared_cubit/shared_cubit.dart';
+import 'package:jewellry_shop/states/jew/jew_provider.dart';
+import 'package:jewellry_shop/states/jew_state.dart';
 import 'package:jewellry_shop/ui/widgets/counter_button.dart';
 import 'package:jewellry_shop/ui/widgets/empty_wrapper.dart';
 import 'package:jewellry_shop/ui_kit/_ui_kit.dart';
 import '../../data/_data.dart';
+import 'package:provider/provider.dart';
 
 class CartScreen extends StatelessWidget {
   CartScreen({super.key});
@@ -13,8 +14,7 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cartItems = context.select((SharedCubit b) => b.cart);
-    debugPrint('CartScreen >> Перерисовка корзины');
+    final List<Jew> cartItems = context.watch<JewProvider>().getCartList;
     return Scaffold(
       appBar: _appBar(context),
       body: EmptyWrapper(
@@ -36,6 +36,8 @@ class CartScreen extends StatelessWidget {
   }
 
   Widget _cartListView(BuildContext context, List<Jew> cartItems) {
+    // final List<Jew> cartItems = context.watch<JewProvider>().getCartList;
+    // final isDark = Theme.of(context).brightness == Brightness.dark;
     return ListView.separated(
       padding: const EdgeInsets.all(30),
       itemCount: cartItems.length,
@@ -46,7 +48,7 @@ class CartScreen extends StatelessWidget {
           onDismissed: (direction) {
             if (direction == DismissDirection.endToStart) {
               print('Удаляем');
-              context.read<SharedCubit>().onRemoveFromCartTap(jew.id);
+              context.read<JewProvider>().deleteFromCart(cartItems[index]);
             }
           },
           key: UniqueKey(),
@@ -96,17 +98,21 @@ class CartScreen extends StatelessWidget {
                 Column(
                   children: [
                     CounterButton(
-                      onIncrementTap: () => context.read<SharedCubit>().onIncreaseQuantityTap(jew.id),
-                      onDecrementTap: () => context.read<SharedCubit>().onDecreaseQuantityTap(jew.id),
+                      onIncrementTap: () =>
+                          context
+                              .read<JewProvider>().increaseQuantity(cartItems[index]),
+                      onDecrementTap: () =>
+                          context
+                              .read<JewProvider>().decreaseQuantity(cartItems[index]),
                       size: const Size(24, 24),
                       padding: 0,
                       label: Text(
-                        jew.quantity.toString(),
+                        cartItems[index].quantity.toString(),
                         style: Theme.of(context).textTheme.displayMedium,
                       ),
                     ),
                     Text(
-                      "\$${context.read<SharedCubit>().jewPrice(jew)}",
+                      '\$${context.read<JewProvider>().priceJew(cartItems[index])}',
                       style: AppTextStyle.h2Style.copyWith(color: LightThemeColor.purple),
                     )
                   ],
@@ -148,7 +154,7 @@ class CartScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.headlineSmall,
                               ),
                               Text(
-                                "\$${context.read<SharedCubit>().subtotal}",
+                                "\$${context.read<JewProvider>().subtotalPrice}",
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                             ],
@@ -185,7 +191,7 @@ class CartScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                               Text(
-                                "\$${context.read<SharedCubit>().subtotal + taxes}",
+                                "\$${context.read<JewProvider>().subtotalPrice + taxes}",
                                 style: AppTextStyle.h2Style.copyWith(
                                   color: LightThemeColor.purple,
                                 ),
@@ -200,7 +206,7 @@ class CartScreen extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 30),
                             child: ElevatedButton(
-                              onPressed: () => context.read<SharedCubit>().onCheckOutTap(),
+                              onPressed: () => context.read<JewProvider>().cleanCart(),
                               child: const Text("Checkout"),
                             ),
                           ),
