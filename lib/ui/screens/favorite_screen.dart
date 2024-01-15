@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jewellry_shop/data/_data.dart';
-import 'package:jewellry_shop/states/jew/jew_provider.dart';
 import 'package:jewellry_shop/states/jew_state.dart';
-import 'package:provider/provider.dart';
 import 'package:jewellry_shop/ui/widgets/empty_wrapper.dart';
 import 'package:jewellry_shop/ui_kit/_ui_kit.dart';
 
@@ -11,7 +9,7 @@ class FavoriteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final favoriteJew = context.watch<JewProvider>().isFavorite;
+    final favoriteJew = AppData.favoriteItems;
     debugPrint('FavoriteScreen >> Перерисовка любимых');
     return Scaffold(
       appBar: _appBar(context),
@@ -34,7 +32,7 @@ class FavoriteScreen extends StatelessWidget {
   }
 
   Widget _favoriteListView(BuildContext context) {
-    final favoriteJew = context.watch<JewProvider>().isFavorite;
+    final favoriteJew = AppData.favoriteItems;
     return ListView.separated(
       padding: const EdgeInsets.all(30),
       itemCount: favoriteJew.length,

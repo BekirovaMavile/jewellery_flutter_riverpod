@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:jewellry_shop/states/jew/jew_provider.dart';
 import 'package:jewellry_shop/states/jew_state.dart';
 import 'package:jewellry_shop/ui/widgets/counter_button.dart';
 import 'package:jewellry_shop/ui/widgets/empty_wrapper.dart';
 import 'package:jewellry_shop/ui_kit/_ui_kit.dart';
 import '../../data/_data.dart';
-import 'package:provider/provider.dart';
 
 class CartScreen extends StatelessWidget {
   CartScreen({super.key});
@@ -14,7 +12,8 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Jew> cartItems = context.watch<JewProvider>().getCartList;
+    final cartItems = AppData.cartItems;
+    // final List<Jew> cartItems = context.watch<JewProvider>().getCartList;
     return Scaffold(
       appBar: _appBar(context),
       body: EmptyWrapper(
@@ -48,7 +47,6 @@ class CartScreen extends StatelessWidget {
           onDismissed: (direction) {
             if (direction == DismissDirection.endToStart) {
               print('Удаляем');
-              context.read<JewProvider>().deleteFromCart(cartItems[index]);
             }
           },
           key: UniqueKey(),
@@ -98,12 +96,8 @@ class CartScreen extends StatelessWidget {
                 Column(
                   children: [
                     CounterButton(
-                      onIncrementTap: () =>
-                          context
-                              .read<JewProvider>().increaseQuantity(cartItems[index]),
-                      onDecrementTap: () =>
-                          context
-                              .read<JewProvider>().decreaseQuantity(cartItems[index]),
+                      onIncrementTap: () {},
+                      onDecrementTap: () {},
                       size: const Size(24, 24),
                       padding: 0,
                       label: Text(
@@ -112,7 +106,7 @@ class CartScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '\$${context.read<JewProvider>().priceJew(cartItems[index])}',
+                      'price',
                       style: AppTextStyle.h2Style.copyWith(color: LightThemeColor.purple),
                     )
                   ],
@@ -154,7 +148,7 @@ class CartScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.headlineSmall,
                               ),
                               Text(
-                                "\$${context.read<JewProvider>().subtotalPrice}",
+                                "subtotal",
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                             ],
@@ -191,7 +185,7 @@ class CartScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
                               Text(
-                                "\$${context.read<JewProvider>().subtotalPrice + taxes}",
+                                "\$${taxes}",
                                 style: AppTextStyle.h2Style.copyWith(
                                   color: LightThemeColor.purple,
                                 ),
@@ -206,7 +200,7 @@ class CartScreen extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 30),
                             child: ElevatedButton(
-                              onPressed: () => context.read<JewProvider>().cleanCart(),
+                              onPressed: () {},
                               child: const Text("Checkout"),
                             ),
                           ),
