@@ -15,6 +15,7 @@ class JewList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    debugPrint('Первая вкладка >> Весь экран');
     return Scaffold(
       appBar: _appBar(context),
       body: Padding(
@@ -24,11 +25,11 @@ class JewList extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Morning, Mavi",
+                "Morning, Sunny",
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               Text(
-                "What jewellery do you want\nto buy today",
+                "What sticker do you want\nto buy today",
                 style: Theme.of(context).textTheme.displayLarge,
               ),
               _searchBar(),
@@ -37,14 +38,14 @@ class JewList extends ConsumerWidget {
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               _categories(context),
-              JewListView(jews: ref.read(sharedProvider).jewsByCategory),
+              JewListView(jews: ref.watch(sharedProvider.select((state) => state.jewsByCategory))),
               Padding(
                 padding: const EdgeInsets.only(top: 25, bottom: 5),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Best jewellery of the week",
+                      "Best stickers of the week",
                       style: Theme.of(context).textTheme.displaySmall,
                     ),
                     Padding(
@@ -57,7 +58,10 @@ class JewList extends ConsumerWidget {
                   ],
                 ),
               ),
-              JewListView(jews: ref.read(sharedProvider).jews, isReversed: true),
+              JewListView(
+                jews: ref.read(sharedProvider).jews,
+                isReversed: true,
+              ),
             ],
           ),
         ),
@@ -69,9 +73,7 @@ class JewList extends ConsumerWidget {
     return AppBar(
       leading: IconButton(
         icon: const FaIcon(FontAwesomeIcons.dice),
-        onPressed: () {
-
-        },
+        onPressed: () {},
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -105,7 +107,7 @@ class JewList extends ConsumerWidget {
       padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       child: TextField(
         decoration: InputDecoration(
-          hintText: 'Search jewellery',
+          hintText: 'Search sticker',
           prefixIcon: Icon(Icons.search, color: Colors.grey),
         ),
       ),
@@ -119,6 +121,7 @@ class JewList extends ConsumerWidget {
         height: 40,
         child: Consumer(builder: (_, WidgetRef ref,__){
           final categories = ref.watch(sharedProvider.select((state) => state.categories));
+          debugPrint('Первая вкладка >> Категории');
           return ListView.separated(
               scrollDirection: Axis.horizontal,
               itemBuilder: (_, index) {

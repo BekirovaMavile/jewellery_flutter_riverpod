@@ -20,8 +20,27 @@ class SharedNotifier extends StateNotifier<SharedState> {
       state = state.copyWith(categories: categories, jewsByCategory: jewsByCategory);
     } else {
       final jewsByCategory = state.jews.where((e) => e.type == category.type).toList();
-      state = state.copyWith(categories: categories, jewsByCategory: AppData.jewItems);
+      state = state.copyWith(categories: categories, jewsByCategory: jewsByCategory);
     }
+  }
+  Future<void> onIncreaseQuantityTap(int jewId) async {
+    final jews = state.jews.map((e) {
+      if (e.id == jewId) {
+        return e.copyWith(quantity: e.quantity + 1);
+      } else {
+        return e;
+      }
+    }).toList();
+  }
+
+  Future<void> onDecreaseQuantityTap(int jewId) async {
+    final jews = state.jews.map((e) {
+      if (e.id == jewId) {
+        return e.quantity == 1 ? e : e.copyWith(quantity: e.quantity - 1);
+      } else {
+        return e;
+      }
+    }).toList();
   }
 
 }

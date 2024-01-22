@@ -3,15 +3,17 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jewellry_shop/data/_data.dart';
 import 'package:jewellry_shop/states/jew_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jewellry_shop/states/shared/shared_provider.dart';
 import 'package:jewellry_shop/ui/widgets/counter_button.dart';
 import 'package:jewellry_shop/ui_kit/_ui_kit.dart';
 
-class JewDetail extends StatelessWidget {
+class JewDetail extends ConsumerWidget {
   const JewDetail({super.key, required this.jew});
   final Jew jew;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: _appBar(context),
       body: Center(child: Image.asset(jew.image, scale: 2)),
@@ -36,8 +38,6 @@ class JewDetail extends StatelessWidget {
   }
 
   Widget _floatingActionButton(BuildContext context) {
-    // final List<Jew> jewList = context.watch<JewProvider>().state.jewList;
-    // final jewIndex = jewList.indexWhere((element) => element.id == jew.id);
     return Builder(
         builder: (context) {
           return FloatingActionButton(
@@ -105,16 +105,17 @@ class JewDetail extends StatelessWidget {
                             "\$${jew.price}",
                             style: Theme.of(context).textTheme.displayLarge?.copyWith(color: LightThemeColor.purple),
                           ),
-                           CounterButton(
-                                  onIncrementTap: () {
-                                  },
-                                  onDecrementTap: () {
-                                  },
-                                  label: Text(
-                                    '${jew.quantity}',
-                                    style: Theme.of(context).textTheme.displayLarge,
-                                  ),
-                                ),
+                           Consumer(builder: (_, WidgetRef ref,__){
+                             return CounterButton(
+                                    onIncrementTap: () => ref.read(sharedProvider.notifier).onIncreaseQuantityTap(jew.id),
+                                    onDecrementTap: () => ref.read(sharedProvider.notifier).onDecreaseQuantityTap(jew.id),
+                                    label: Text(
+                                      '${jew.quantity}',
+                                      style: Theme.of(context).textTheme.displayLarge,
+                                    ),
+                                  );
+                              }
+                           ),
                         ],
                       ),
                       const SizedBox(height: 15),
