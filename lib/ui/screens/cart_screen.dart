@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jewellry_shop/states/jew_state.dart';
+import 'package:jewellry_shop/states/shared/shared_provider.dart';
 import 'package:jewellry_shop/ui/widgets/counter_button.dart';
 import 'package:jewellry_shop/ui/widgets/empty_wrapper.dart';
 import 'package:jewellry_shop/ui_kit/_ui_kit.dart';
 import '../../data/_data.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends ConsumerWidget {
   CartScreen({super.key});
   double taxes = 5.0;
 
   @override
-  Widget build(BuildContext context) {
-    final cartItems = AppData.cartItems;
-    // final List<Jew> cartItems = context.watch<JewProvider>().getCartList;
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final cartItems = AppData.cartItems;
+    final List<Jew> cartItems = ref.watch(sharedProvider.select((state) => state.getCartList));
     return Scaffold(
       appBar: _appBar(context),
       body: EmptyWrapper(
@@ -35,85 +37,98 @@ class CartScreen extends StatelessWidget {
   }
 
   Widget _cartListView(BuildContext context, List<Jew> cartItems) {
-    // final List<Jew> cartItems = context.watch<JewProvider>().getCartList;
-    // final isDark = Theme.of(context).brightness == Brightness.dark;
     return ListView.separated(
       padding: const EdgeInsets.all(30),
       itemCount: cartItems.length,
       itemBuilder: (_, index) {
         final jew = cartItems[index];
-        return Dismissible(
-          direction: DismissDirection.endToStart,
-          onDismissed: (direction) {
-            if (direction == DismissDirection.endToStart) {
-              print('Удаляем');
-            }
-          },
-          key: UniqueKey(),
-          background: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 25,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.redAccent,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: const FaIcon(FontAwesomeIcons.trash),
+        return Consumer(
+          builder: (_, WidgetRef ref, __){
+            return Dismissible(
+              direction: DismissDirection.endToStart,
+              onDismissed: (direction) {
+                if (direction == DismissDirection.endToStart) {
+                  ref.read(sharedProvider.notifier).deleteFromCart(jew);
+                }
+              },
+              key: UniqueKey(),
+              background: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 25,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: const FaIcon(FontAwesomeIcons.trash),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Theme.of(context).brightness == Brightness.dark ? DarkThemeColor.primaryDark : Colors.white,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const SizedBox(width: 20),
-                Image.asset(jew.image, scale: 10),
-                const SizedBox(width: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      jew.name,
-                      style: Theme.of(context).textTheme.displayMedium,
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      "\$${jew.price}",
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                  ],
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Theme.of(context).brightness == Brightness.dark ? DarkThemeColor.primaryDark : Colors.white,
                 ),
-                const Spacer(),
-                Column(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    CounterButton(
-                      onIncrementTap: () {},
-                      onDecrementTap: () {},
-                      size: const Size(24, 24),
-                      padding: 0,
-                      label: Text(
-                        cartItems[index].quantity.toString(),
-                        style: Theme.of(context).textTheme.displayMedium,
-                      ),
+                    const SizedBox(width: 20),
+                    Image.asset(jew.image, scale: 10),
+                    const SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          jew.name,
+                          style: Theme.of(context).textTheme.displayMedium,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          "\$${jew.price}",
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                      ],
                     ),
-                    Text(
-                      'price',
-                      style: AppTextStyle.h2Style.copyWith(color: LightThemeColor.purple),
+                    const Spacer(),
+                    Column(
+                      children: [
+                        Consumer(
+                          builder: (context, WidgetRef ref, child) {
+                            final int jewIndex = ref.read(sharedProvider).jews.indexWhere((element) => element.id == jew.id);
+                            if (jewIndex != -1) {
+                              final int quantity = ref.watch(sharedProvider.select((state) => state.jews[jewIndex].quantity));
+                              return CounterButton(
+                                onIncrementTap: () =>
+                                    ref.read(sharedProvider.notifier).onIncreaseQuantityTap(jew.id),
+                                onDecrementTap: () =>
+                                    ref.read(sharedProvider.notifier).onDecreaseQuantityTap(jew.id),
+                                size: const Size(24, 24),
+                                padding: 0,
+                                label: Text(
+                                  '$quantity',
+                                  style: Theme.of(context).textTheme.displayLarge,
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                            Text(
+                              '\$${ref.read(sharedProvider.notifier).priceJew(jew)}',
+                              style: AppTextStyle.h2Style.copyWith(color: LightThemeColor.purple),
+                            ),
+                      ],
                     )
                   ],
-                )
-              ],
-            ),
-          ),
+                ),
+              ),
+            );
+          },
         );
       },
       separatorBuilder: (_, __) => Container(
@@ -147,10 +162,14 @@ class CartScreen extends StatelessWidget {
                                 "Subtotal",
                                 style: Theme.of(context).textTheme.headlineSmall,
                               ),
-                              Text(
-                                "subtotal",
-                                style: Theme.of(context).textTheme.displayMedium,
-                              ),
+                              Consumer(
+                                builder: (_, WidgetRef ref, __){
+                                  return Text(
+                                    '\$${ref.read(sharedProvider.notifier).subtotalPrice}',
+                                    style: AppTextStyle.h2Style.copyWith(color: LightThemeColor.purple),
+                                  );
+                                },
+                              )
                             ],
                           ),
                         ),
@@ -184,11 +203,13 @@ class CartScreen extends StatelessWidget {
                                 "Total",
                                 style: Theme.of(context).textTheme.displayMedium,
                               ),
-                              Text(
-                                "\$${taxes}",
-                                style: AppTextStyle.h2Style.copyWith(
-                                  color: LightThemeColor.purple,
-                                ),
+                              Consumer(
+                                builder: (_, WidgetRef ref, __){
+                                  return Text(
+                                    '\$${ref.read(sharedProvider.notifier).subtotalPrice + taxes}',
+                                    style: AppTextStyle.h2Style.copyWith(color: LightThemeColor.purple),
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -199,9 +220,13 @@ class CartScreen extends StatelessWidget {
                           height: 45,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 30),
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              child: const Text("Checkout"),
+                            child: Consumer(
+                              builder: (_, WidgetRef ref, __){
+                                return ElevatedButton(
+                                  onPressed: () => ref.read(sharedProvider.notifier).cleanCart(),
+                                  child: const Text("Checkout"),
+                                );
+                              },
                             ),
                           ),
                         )

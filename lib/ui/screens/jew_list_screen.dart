@@ -17,7 +17,7 @@ class JewList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     debugPrint('Первая вкладка >> Весь экран');
     return Scaffold(
-      appBar: _appBar(context),
+      appBar: _appBar(context, ref),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: SingleChildScrollView(
@@ -69,11 +69,12 @@ class JewList extends ConsumerWidget {
     );
   }
 
-  PreferredSizeWidget _appBar(BuildContext context) {
+  PreferredSizeWidget _appBar(BuildContext context, WidgetRef ref) {
     return AppBar(
       leading: IconButton(
         icon: const FaIcon(FontAwesomeIcons.dice),
-        onPressed: () {},
+        onPressed: () =>
+            ref.read(sharedProvider.notifier).toggleTheme(),
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,

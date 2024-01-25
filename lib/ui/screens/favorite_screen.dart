@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jewellry_shop/data/_data.dart';
 import 'package:jewellry_shop/states/jew_state.dart';
+import 'package:jewellry_shop/states/shared/shared_provider.dart';
 import 'package:jewellry_shop/ui/widgets/empty_wrapper.dart';
 import 'package:jewellry_shop/ui_kit/_ui_kit.dart';
 
-class FavoriteScreen extends StatelessWidget {
+class FavoriteScreen extends ConsumerWidget {
   FavoriteScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final favoriteJew = AppData.favoriteItems;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favoriteJew = ref.watch(sharedProvider.select((state) => state.isFavorite));
     debugPrint('FavoriteScreen >> Перерисовка любимых');
     return Scaffold(
       appBar: _appBar(context),
@@ -17,7 +19,7 @@ class FavoriteScreen extends StatelessWidget {
         type: EmptyWrapperType.favorite,
         title: "Empty favorite",
         isEmpty: favoriteJew.isEmpty,
-        child: _favoriteListView(context),
+        child: _favoriteListView(context, ref),
       ),
     );
   }
@@ -31,8 +33,8 @@ class FavoriteScreen extends StatelessWidget {
     );
   }
 
-  Widget _favoriteListView(BuildContext context) {
-    final favoriteJew = AppData.favoriteItems;
+  Widget _favoriteListView(BuildContext context, WidgetRef ref) {
+    final favoriteJew = ref.watch(sharedProvider.select((state) => state.isFavorite));
     return ListView.separated(
       padding: const EdgeInsets.all(30),
       itemCount: favoriteJew.length,

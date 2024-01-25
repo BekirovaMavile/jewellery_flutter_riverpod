@@ -8,10 +8,6 @@ class JewState {
   static final _instance = JewState._();
   factory JewState() => _instance;
 
-  // GlobalKey<CartScreenState> cartKey = GlobalKey();
-  // GlobalKey<FavoriteScreenState> favoriteKey =
-  // GlobalKey();
-
   //Переменные
   List<JewCategory> categories = AppData.categories;
   List<Jew> jews = AppData.jewItems;

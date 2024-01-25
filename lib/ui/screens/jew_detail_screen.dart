@@ -17,7 +17,7 @@ class JewDetail extends ConsumerWidget {
     return Scaffold(
       appBar: _appBar(context),
       body: Center(child: Image.asset(jew.image, scale: 2)),
-      floatingActionButton: _floatingActionButton(context),
+      floatingActionButton: _floatingActionButton(context, ref),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: _bottomAppBar(context),
     );
@@ -37,17 +37,18 @@ class JewDetail extends ConsumerWidget {
     );
   }
 
-  Widget _floatingActionButton(BuildContext context) {
-    return Builder(
-        builder: (context) {
-          return FloatingActionButton(
-            elevation: 0.0,
-            backgroundColor: LightThemeColor.purple,
-            onPressed: () {
-            },
-            child: jew.isFavorite ? const Icon(AppIcon.heart) : const Icon(AppIcon.outlinedHeart),
-          );
+  Widget _floatingActionButton(BuildContext context, WidgetRef ref) {
+    final List<Jew> jewList = ref.watch(sharedProvider.select((state) => state.jews));
+    final jewIndex = jewList.indexWhere((element) => element.id == jew.id);
+    return FloatingActionButton(
+      elevation: 0.0,
+      backgroundColor: LightThemeColor.purple,
+      onPressed: () {
+        if (jewIndex != -1) {
+              ref.read(sharedProvider.notifier).isFavoriteTab(jew);
         }
+      },
+      child: jewIndex != -1 && jewList[jewIndex].isFavorite ? const Icon(AppIcon.heart) : const Icon(AppIcon.outlinedHeart),
     );
   }
 
@@ -105,17 +106,25 @@ class JewDetail extends ConsumerWidget {
                             "\$${jew.price}",
                             style: Theme.of(context).textTheme.displayLarge?.copyWith(color: LightThemeColor.purple),
                           ),
-                           Consumer(builder: (_, WidgetRef ref,__){
-                             return CounterButton(
-                                    onIncrementTap: () => ref.read(sharedProvider.notifier).onIncreaseQuantityTap(jew.id),
-                                    onDecrementTap: () => ref.read(sharedProvider.notifier).onDecreaseQuantityTap(jew.id),
-                                    label: Text(
-                                      '${jew.quantity}',
-                                      style: Theme.of(context).textTheme.displayLarge,
-                                    ),
-                                  );
+                          Consumer(
+                            builder: (context, WidgetRef ref, child) {
+                              final int jewIndex = ref.read(sharedProvider).jews.indexWhere((element) => element.id == jew.id);
+                              if (jewIndex != -1) {
+                                final int quantity = ref.watch(sharedProvider.select((state) => state.jews[jewIndex].quantity));
+                                return CounterButton(
+                                  onIncrementTap: () =>
+                                      ref.read(sharedProvider.notifier).onIncreaseQuantityTap(jew.id),
+                                  onDecrementTap: () =>
+                                      ref.read(sharedProvider.notifier).onDecreaseQuantityTap(jew.id),
+                                  label: Text(
+                                    '$quantity',
+                                    style: Theme.of(context).textTheme.displayLarge,
+                                  ),
+                                );
                               }
-                           ),
+                              return const SizedBox.shrink();
+                            },
+                          ),
                         ],
                       ),
                       const SizedBox(height: 15),
@@ -134,10 +143,13 @@ class JewDetail extends ConsumerWidget {
                         height: 45,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 30),
-                          child: ElevatedButton(
-                            onPressed: () {
+                          child: Consumer(
+                            builder: (_, WidgetRef ref, __){
+                              return ElevatedButton(
+                                onPressed: () => ref.read(sharedProvider.notifier).addToCart(jew),
+                                child: const Text("Add to cart"),
+                              );
                             },
-                            child: const Text("Add to cart"),
                           ),
                         ),
                       )
