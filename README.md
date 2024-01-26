@@ -1,16 +1,26 @@
-# jewellry_shop
+# Магазин ювелирных украшений
+Учебный Flutter проект.
+<br/>
+Бизнес логика реализована с помощью Riverpod.
+<br/>
 
-A new Flutter project.
+## :construction: Версии Dart && Flutter
 
-## Getting Started
+```cmd
+doctor --verbose
+[✓] Flutter (Channel stable, 3.16.4, on macOS 14.0 23A344 darwin-arm64, locale ru-RU)
+    • Flutter version 3.16.4 
+    ...
+    • Dart version 3.2.3
+```
+<br/>
+В pubspec.yaml добавлены следующие библиотеки:
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```yaml
+dependencies:
+flutter:
+sdk: flutter
+#...
+equatable: ^2.0.5
+flutter_riverpod: ^2.4.9
+```
